@@ -8,61 +8,115 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
   const THESIS = "你好像来过这里，但记不起是第几次。";
-  const LEDGER_KEY = "dreamcore-ledger-v1";
-  const SHARD_TOTAL = 8;
+  const LEDGER_KEY = "dreamcore-ledger-v2";
+  const SHARD_TOTAL = 10;
 
-  /* ---------- story copy ---------- */
+  /* ---------- story copy · 没走成的那一晚 ---------- */
   const CHOICE_WHISPER = {
     cafe: {
-      login: "那台机器认识你。",
-      fan: "风扇停了。屏保还在。",
+      login: "那台机器认识你。卡号亮了一下。",
+      fan: "风扇停了。聊天窗口更清楚——我马上到。",
     },
     stair: {
-      intercom: "没人接。灯还亮。",
-      up: "上面更安静。",
+      intercom: "铃在空楼里散开。没有脚步。",
+      up: "口袋沉了一下。一枚硬币。",
     },
     wait: {
-      sit: "等着。车不来。",
-      wipe: "雾开了一线。",
+      sit: "你坐下。形状对上了。车仍不来。",
+      wipe: "雾后是空站台。字还在：走。",
+    },
+  };
+
+  const AFTERMATH = {
+    cafe: {
+      login: {
+        beat: "号挂上了。像是你的，又像借来的。有人等你登完再走。",
+        hint: "回走廊。楼道那盏灯，也许认得这串号。",
+      },
+      fan: {
+        beat: "风停了。屏幕更刺眼。有人会回来关——或者不会。",
+        hint: "回走廊。还有门缝漏着光。",
+      },
+    },
+    stair: {
+      intercom: {
+        beat: "再按一次。对讲里只有电流。四楼的灯颤了一下。",
+        hint: "回走廊。梦还没做完。",
+      },
+      up: {
+        beat: "你没下楼。台阶往上更暗。硬币在掌心还温。",
+        hint: "回走廊。候车室也许用得着它。",
+      },
+    },
+    wait: {
+      sit: {
+        beat: "蓝椅接住你。广播沙沙响。这一晚，车没有开过来。",
+        hint: "回走廊。或者向下，去把字拼完。",
+      },
+      wipe: {
+        beat: "雾开一线。外面空着。玻璃上未写完的字，露出来了。",
+        hint: "回走廊。残响里也许能读全。",
+      },
     },
   };
 
   const CORRIDOR_AFTER = {
     cafe: {
-      login: "还亮着的那台，好像登过。",
-      fan: "风扇停了。更安静了。",
+      login: "还亮着的那台，登过了。卡号跟着你。",
+      fan: "风扇停了。网吧更安静。像有人刚起身。",
     },
     stair: {
-      intercom: "对讲里没人接。",
-      up: "再往上，灯更暗。",
+      intercom: "对讲里没人接。灯还亮着。",
+      up: "硬币还温。往上的灯更暗。",
     },
     wait: {
-      sit: "椅子还留着温度。",
-      wipe: "玻璃清了一块。外面还是雾。",
+      sit: "椅子留着你的温度。车没来。",
+      wipe: "雾开了。未写完的字，还在玻璃上。",
     },
   };
 
   const CAPTION_AFTER = {
     cafe: {
-      login: "有光的门，有人登过。",
+      login: "有光的门，有人登过号。",
       fan: "风停了。灯管还在响。",
     },
     stair: {
       intercom: "绿墙旁，对讲灯还亮。",
-      up: "绿墙往上，更绿。",
+      up: "绿墙往上，口袋里有硬币。",
     },
     wait: {
       sit: "有光的门，车还没来。",
-      wipe: "雾散了一线。门还在。",
+      wipe: "雾散了一线。字还没写完。",
     },
   };
 
   const WAKE_VARIANTS = {
-    dawn: { line: "天亮了。", sub: "" },
-    more: { line: "记得更多。", sub: "这一次，门牌对上了。" },
-    forgot: { line: "几乎忘了。", sub: "绿墙还在。别的没有。" },
-    waiting: { line: "有人在等。", sub: "蓝椅是空的。你不在。" },
-    lights: { line: "灯还没关。", sub: "像有人刚走。" },
+    dawn: {
+      lines: ["天亮了。", "你什么也没带上。", "像从没打算走。"],
+    },
+    forgot: {
+      lines: ["几乎忘了。", "绿墙还在。", "那晚的门，没关上。"],
+    },
+    more: {
+      lines: ["记得更多。", "三处的灯都亮过。", "还是没走到外面。"],
+    },
+    waiting: {
+      lines: ["有人在等。", "蓝椅是空的。你不在。", "车开过了。或者没有。"],
+    },
+    lights: {
+      lines: ["灯还没关。", "像有人刚走。", "又像你还坐在那里。"],
+    },
+    loop: {
+      lines: [
+        "卡号、硬币、未写完的字。",
+        "这一次，链条接上了。",
+        "天亮了。走廊还亮着。",
+        "你好像还会再来。",
+      ],
+    },
+    stay: {
+      lines: ["你没有走。", "风扇关了。对讲静了。雾开了。", "梦把你送回同一扇门。"],
+    },
   };
 
   /* ---------- memory ledger ---------- */
@@ -71,10 +125,13 @@
       shards: [],
       choices: {},
       visited: {},
+      visitOrder: [],
       explored: {},
       exploredTokens: {},
       corridorSaid: {},
       captionSlot: null,
+      hintsSaid: {},
+      aftermath: {},
     };
   }
 
@@ -89,9 +146,12 @@
         shards: Array.isArray(parsed.shards) ? parsed.shards : [],
         choices: parsed.choices && typeof parsed.choices === "object" ? parsed.choices : {},
         visited: parsed.visited && typeof parsed.visited === "object" ? parsed.visited : {},
+        visitOrder: Array.isArray(parsed.visitOrder) ? parsed.visitOrder : [],
         explored: parsed.explored && typeof parsed.explored === "object" ? parsed.explored : {},
         exploredTokens: parsed.exploredTokens && typeof parsed.exploredTokens === "object" ? parsed.exploredTokens : {},
         corridorSaid: parsed.corridorSaid && typeof parsed.corridorSaid === "object" ? parsed.corridorSaid : {},
+        hintsSaid: parsed.hintsSaid && typeof parsed.hintsSaid === "object" ? parsed.hintsSaid : {},
+        aftermath: parsed.aftermath && typeof parsed.aftermath === "object" ? parsed.aftermath : {},
       };
     } catch {
       return blankLedger();
@@ -137,14 +197,34 @@
   }
 
   function markVisited(roomId) {
-    if (!roomId || ledger.visited[roomId]) return;
+    if (!roomId) return;
+    const first = !ledger.visited[roomId];
     ledger.visited[roomId] = true;
+    if (first) {
+      ledger.visitOrder = Array.isArray(ledger.visitOrder) ? ledger.visitOrder : [];
+      if (!ledger.visitOrder.includes(roomId)) ledger.visitOrder.push(roomId);
+    }
     saveLedger();
   }
 
   function setChoice(roomId, choice) {
     ledger.choices[roomId] = choice;
     saveLedger();
+  }
+
+  function visitedBefore(roomId, otherId) {
+    const order = ledger.visitOrder || [];
+    const a = order.indexOf(otherId);
+    const b = order.indexOf(roomId);
+    return a !== -1 && (b === -1 || a < b);
+  }
+
+  function chainComplete() {
+    return hasShard("stair-ticket") && hasShard("wait-coin") && hasShard("wait-letter");
+  }
+
+  function choiceCount() {
+    return Object.keys(ledger.choices).length;
   }
 
   /* ---------- cursor ---------- */
@@ -162,7 +242,7 @@
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-    const hoverables = "a, button, .portal, .mute, .wake__replay, .room__back, .enter__go, .frag, .echo, .memspot, .map-toggle, .map-overlay__close, .room__choice-btn";
+    const hoverables = "a, button, .portal, .mute, .wake__replay, .room__back, .enter__go, .frag, .echo, .memspot, .map-toggle, .map-overlay__close, .room__choice-btn, .room__aftermath";
     document.addEventListener("mouseover", (e) => {
       if (e.target.closest(hoverables)) cursor.classList.add("is-hover");
     });
@@ -551,6 +631,7 @@
       });
 
       $$(".echo").forEach((el, i) => {
+        if (el.classList.contains("echo--story")) return;
         gsap.fromTo(el, { y: 24 + (i % 3) * 8, opacity: 0 }, {
           y: 0, opacity: 1, duration: 1,
           scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none reverse" },
@@ -581,13 +662,33 @@
 
   /* ---------- corridor portal whispers ---------- */
   const whisper = $("#corridorWhisper");
-  const WHISPERS = {
-    cafe: "蓝光从门缝漏出来。",
-    stair: "对讲灯还亮着。",
-    wait: "车还没来。也许永远不来。",
-  };
   let whisperTimer = null;
   let leaveWhisperPending = null;
+
+  function portalWhisperFor(roomId) {
+    if (roomId === "cafe") {
+      if (ledger.choices.cafe === "login") return "那台机器，号还挂着。";
+      if (ledger.choices.cafe === "fan") return "风扇停了。蓝光还在。";
+      if (ledger.visited.stair) return "楼道之后——蓝光从门缝漏出来。";
+      if (ledger.visited.wait) return "车没来。网吧倒还亮。";
+      return "蓝光从门缝漏出来。";
+    }
+    if (roomId === "stair") {
+      if (ledger.choices.cafe === "login") return "对讲灯还亮。像记得那串号。";
+      if (ledger.choices.stair === "up") return "往上更暗。硬币还温。";
+      if (ledger.visited.cafe && !ledger.choices.cafe) return "网吧还亮着。这边灯也没关。";
+      if (ledger.visited.wait) return "站台空着。单元门的灯还亮。";
+      return "对讲灯还亮着。";
+    }
+    if (roomId === "wait") {
+      if (ledger.choices.stair === "up") return "口袋里有硬币。车还没来。";
+      if (ledger.choices.cafe === "login") return "号挂着。车不会等。";
+      if (ledger.visited.stair) return "对讲没人接。车也许也不来。";
+      if (ledger.visited.cafe) return "蓝光还在眼里。候车室更冷。";
+      return "车还没来。也许永远不来。";
+    }
+    return "";
+  }
 
   function showCorridorWhisper(text, holdMs = 2800) {
     if (!whisper || !text) return;
@@ -604,7 +705,7 @@
   $$(".portal").forEach((btn) => {
     btn.addEventListener("mouseenter", () => {
       if (!whisper || leaveWhisperPending) return;
-      whisper.textContent = WHISPERS[btn.dataset.room] || "";
+      whisper.textContent = portalWhisperFor(btn.dataset.room);
       whisper.hidden = false;
       whisper.classList.add("is-on");
       clearTimeout(whisperTimer);
@@ -618,13 +719,102 @@
   });
 
   /* ---------- story UI sync ---------- */
+  function enterWhisperFor(roomId) {
+    const base = $(`.room__panel[data-room-panel="${roomId}"] .room__whisper`)?.dataset.whisperDefault || "";
+    if (roomId === "cafe") {
+      if (visitedBefore("cafe", "stair") && visitedBefore("cafe", "wait")) {
+        return "两处都空着。只有这台还挂着。";
+      }
+      if (visitedBefore("cafe", "stair")) {
+        if (ledger.choices.stair === "intercom") return "对讲没人接。你才跑到还亮着的机器前。";
+        if (ledger.choices.stair === "up") return "硬币还在口袋。屏幕倒认识你。";
+        return "楼道的灯还亮。网吧的蓝光更亮。";
+      }
+      if (visitedBefore("cafe", "wait")) {
+        if (ledger.choices.wait === "sit") return "你刚从空椅子起来。号还挂着。";
+        return "车没来。屏幕倒还亮着。";
+      }
+      return base || "今晚本该走。机器还亮着。";
+    }
+    if (roomId === "stair") {
+      if (ledger.choices.cafe === "login") {
+        return "蓝光还留在眼睛里。对讲灯也亮。像同一件事。";
+      }
+      if (ledger.choices.cafe === "fan") {
+        return "风停之后，楼道更响。有人按过。";
+      }
+      if (visitedBefore("stair", "cafe")) {
+        return "网吧门缝漏着光。这边——对讲灯也没关。";
+      }
+      if (visitedBefore("stair", "wait")) {
+        return "车没来。你又回到单元门。";
+      }
+      return base || "有人按过。灯还亮着。没人应。";
+    }
+    if (roomId === "wait") {
+      if (ledger.choices.cafe === "login" && ledger.choices.stair === "up") {
+        return "卡号和硬币都在。位子还凹着。像专等你来写完。";
+      }
+      if (ledger.choices.cafe === "login") {
+        return "那台机器还挂着号。车不会等。";
+      }
+      if (ledger.choices.stair === "intercom") {
+        return "对讲没人接。也许车也不会来。";
+      }
+      if (ledger.choices.stair === "up") {
+        return "口袋里的硬币还温。蓝椅空着。";
+      }
+      if (visitedBefore("wait", "cafe") && !visitedBefore("wait", "stair")) {
+        return "你先看见了蓝光。此刻椅子更空。";
+      }
+      if (visitedBefore("wait", "stair")) {
+        return "楼道的回声还在。候车室更冷。";
+      }
+      return base || "位子还留着形状。人已经不在。";
+    }
+    return base;
+  }
+
   function applyRoomWhisper(roomId) {
     const panel = $(`.room__panel[data-room-panel="${roomId}"]`);
     const el = panel?.querySelector(".room__whisper");
     if (!el) return;
     const choice = ledger.choices[roomId];
-    const next = (choice && CHOICE_WHISPER[roomId]?.[choice]) || el.dataset.whisperDefault || el.textContent;
+    const next = (choice && CHOICE_WHISPER[roomId]?.[choice]) || enterWhisperFor(roomId);
     el.textContent = next;
+  }
+
+  function syncAftermathUI(roomId) {
+    const dock = $(`.room__aftermath[data-aftermath-for="${roomId}"]`);
+    if (!dock) return;
+    const choice = ledger.choices[roomId];
+    const pack = choice && AFTERMATH[roomId]?.[choice];
+    if (!pack || !ledger.aftermath[roomId]) {
+      dock.hidden = true;
+      dock.classList.remove("is-on");
+      return;
+    }
+    const beat = dock.querySelector(".room__aftermath-beat");
+    const hint = dock.querySelector(".room__aftermath-hint");
+    if (beat) beat.textContent = pack.beat;
+    if (hint) hint.textContent = pack.hint;
+    dock.hidden = false;
+    requestAnimationFrame(() => dock.classList.add("is-on"));
+  }
+
+  function showAftermath(roomId, choice) {
+    const pack = AFTERMATH[roomId]?.[choice];
+    if (!pack) return;
+    ledger.aftermath[roomId] = true;
+    saveLedger();
+    const dock = $(`.room__aftermath[data-aftermath-for="${roomId}"]`);
+    if (!dock) return;
+    const beat = dock.querySelector(".room__aftermath-beat");
+    const hint = dock.querySelector(".room__aftermath-hint");
+    if (beat) beat.textContent = pack.beat;
+    if (hint) hint.textContent = pack.hint;
+    dock.hidden = false;
+    requestAnimationFrame(() => dock.classList.add("is-on"));
   }
 
   function syncChoiceUI(roomId) {
@@ -633,6 +823,7 @@
     if (ledger.choices[roomId]) {
       dock.hidden = true;
       dock.classList.remove("is-on");
+      syncAftermathUI(roomId);
       return;
     }
     const explored = ledger.explored[roomId] || 0;
@@ -645,13 +836,20 @@
       dock.hidden = true;
       dock.classList.remove("is-on");
     }
+    syncAftermathUI(roomId);
+  }
+
+  function requiresMet(req) {
+    if (!req) return false;
+    return req.split("+").every((part) => {
+      const [roomId, choice] = part.split(":");
+      return roomId && choice && ledger.choices[roomId] === choice;
+    });
   }
 
   function unlockCallbacks() {
     $$(".frag--callback").forEach((btn) => {
-      const req = btn.dataset.requires || "";
-      const [roomId, choice] = req.split(":");
-      const ok = roomId && choice && ledger.choices[roomId] === choice;
+      const ok = requiresMet(btn.dataset.requires || "");
       if (ok) {
         btn.hidden = false;
         btn.classList.add("is-unlocked");
@@ -695,7 +893,6 @@
     if (ledger.captionSlot == null) return;
     const slot = caps[ledger.captionSlot];
     if (!slot) return;
-    // prefer most recent room reaction stored as caption text override
     const order = ["wait", "stair", "cafe"];
     for (const roomId of order) {
       const choice = ledger.choices[roomId];
@@ -707,18 +904,33 @@
     }
   }
 
+  function setEchoVisible(el, on) {
+    if (!el) return;
+    el.hidden = !on;
+    el.classList.toggle("is-story-on", !!on);
+  }
+
   function syncEchoes() {
     const bus = $(`.echo[data-echo-id="bus"]`);
     const cursorEcho = $(`.echo[data-echo-id="cursor"]`);
+    const times = $(`.echo[data-echo-id="times"]`);
+    const keys = $(`.echo[data-echo-id="keys"]`);
+    const card = $(`.echo[data-echo-id="card"]`);
+    const coin = $(`.echo[data-echo-id="coin"]`);
+    const letter = $(`.echo[data-echo-id="letter"]`);
+
     if (bus) {
       const base = bus.dataset.echoBase || "站台空着。灯还亮。";
       if (ledger.choices.wait === "wipe") {
-        bus.dataset.echo = "雾开了。外面还是空的。";
+        bus.textContent = "雾开了";
+        bus.dataset.echo = "雾开了。外面还是空的。字没写完。";
         bus.classList.add("is-altered");
       } else if (ledger.choices.wait === "sit") {
-        bus.dataset.echo = "蓝椅上，有人坐过。";
+        bus.textContent = "有人坐过";
+        bus.dataset.echo = "蓝椅上，形状对过一下。";
         bus.classList.add("is-altered");
       } else {
+        bus.textContent = "车晚点了";
         bus.dataset.echo = base;
         bus.classList.remove("is-altered");
       }
@@ -726,45 +938,109 @@
     if (cursorEcho) {
       const base = cursorEcho.dataset.echoBase || "光标还在跳。";
       if (ledger.choices.cafe === "login") {
-        cursorEcho.dataset.echo = "号还挂着。你登过。";
+        cursorEcho.textContent = "号还挂着_";
+        cursorEcho.dataset.echo = "号还挂着。你登过。卡号跟着走了。";
         cursorEcho.classList.add("is-altered");
       } else if (ledger.choices.cafe === "fan") {
-        cursorEcho.dataset.echo = "风扇停了。光标还在。";
+        cursorEcho.textContent = "风停了_";
+        cursorEcho.dataset.echo = "风扇停了。光标还在。我马上到。";
         cursorEcho.classList.add("is-altered");
       } else {
+        cursorEcho.textContent = "你还醒着吗_";
         cursorEcho.dataset.echo = base;
         cursorEcho.classList.remove("is-altered");
       }
+    }
+    if (times) {
+      const n = ledger.shards.length;
+      if (chainComplete()) {
+        times.textContent = "接上了";
+        times.dataset.echo = "卡号、硬币、未写完的字。这一次拼上了。";
+        times.classList.add("is-altered");
+      } else if (choiceCount() >= 2) {
+        times.textContent = "还没走";
+        times.dataset.echo = "记得要走。还没走到。";
+        times.classList.add("is-altered");
+      } else if (n >= 2) {
+        times.textContent = "第几次了？";
+        times.dataset.echo = "碎片多了一点。出口还是模糊。";
+        times.classList.remove("is-altered");
+      } else {
+        times.textContent = "第几次了？";
+        times.dataset.echo = times.dataset.echoBase || "数不清。也许不该数。";
+        times.classList.remove("is-altered");
+      }
+    }
+    if (keys) {
+      if (ledger.choices.stair === "intercom") {
+        keys.dataset.echo = "钥匙在哪一户？对讲没人答。";
+        keys.classList.add("is-altered");
+      } else if (ledger.choices.stair === "up") {
+        keys.dataset.echo = "没带钥匙。口袋里只有硬币。";
+        keys.classList.add("is-altered");
+      } else {
+        keys.dataset.echo = "那串钥匙，后来呢？";
+        keys.classList.remove("is-altered");
+      }
+    }
+
+    setEchoVisible(card, !!(ledger.choices.cafe === "login" || hasShard("stair-ticket")));
+    setEchoVisible(coin, !!(ledger.choices.stair === "up" || hasShard("wait-coin")));
+    setEchoVisible(letter, !!(hasShard("wait-letter") || (ledger.choices.cafe === "login" && ledger.choices.stair === "up" && ledger.choices.wait)));
+
+    const sentence = $("#echoSentence");
+    if (sentence) {
+      let text = "今晚……";
+      if (chainComplete() || (choiceCount() >= 3 && ledger.choices.cafe === "login")) {
+        text = ledger.choices.wait === "wipe" || ledger.choices.cafe === "fan"
+          ? "今晚本该走。你回来了。"
+          : "今晚本该走。你没走。";
+      } else if (choiceCount() >= 2 || (hasShard("stair-ticket") && hasShard("wait-coin"))) {
+        text = "今晚本该走。";
+      } else if (choiceCount() >= 1 || Object.keys(ledger.visited).length >= 2) {
+        text = "今晚本该……";
+      } else if (Object.keys(ledger.visited).length >= 1) {
+        text = "今晚……";
+      }
+      sentence.textContent = text;
+      sentence.classList.toggle("is-complete", text.includes("。") && text.length > 6);
+    }
+
+    const caption = $("#echoesCaption");
+    if (caption) {
+      if (chainComplete()) caption.textContent = "拼出来的句子，像你写的。";
+      else if (choiceCount() >= 1) caption.textContent = "墙上的字，在跟着你改。";
+      else caption.textContent = "墙上留下的，不一定是你写的。";
     }
   }
 
   function resolveWakeKey() {
     const n = ledger.shards.length;
+    const visitedN = Object.keys(ledger.visited).length;
     const { cafe, stair, wait } = ledger.choices;
+
+    if (chainComplete() || (cafe === "login" && stair === "up" && wait && hasShard("stair-ticket") && hasShard("wait-coin"))) {
+      return "loop";
+    }
+    if (cafe === "fan" && stair === "up" && wait === "wipe") return "stay";
     if (wait === "sit") return "waiting";
     if (cafe === "login" || stair === "intercom") return "lights";
-    if (n >= 4) return "more";
-    if (n === 0 && !Object.keys(ledger.visited).length) return "dawn";
-    if (n <= 1) return "forgot";
-    if (n >= 3) return "more";
+    if (n === 0 && visitedN === 0) return "dawn";
+    if (n <= 1 && choiceCount() === 0) return "forgot";
+    if (visitedN >= 2 || n >= 3 || choiceCount() >= 1) return "more";
     return "forgot";
   }
 
   function applyWakeEnding() {
     const key = resolveWakeKey();
     const variant = WAKE_VARIANTS[key] || WAKE_VARIANTS.dawn;
-    const line = $("#wakeLine");
-    const sub = $("#wakeSub");
-    if (line) line.textContent = variant.line;
-    if (sub) {
-      if (variant.sub) {
-        sub.textContent = variant.sub;
-        sub.hidden = false;
-      } else {
-        sub.textContent = "";
-        sub.hidden = true;
-      }
-    }
+    const verses = $("#wakeVerses");
+    if (!verses) return;
+    const lines = variant.lines || [variant.line || "天亮了。"].filter(Boolean);
+    verses.innerHTML = lines.map((line, i) => {
+      const cls = i === 0 ? "wake__line" : "wake__sub";
+      return `<p class="${cls}">${line}</p>`;
+    }).join("");
   }
 
   function syncStoryUI() {
@@ -813,6 +1089,45 @@
     setTimeout(() => showCorridorWhisper(line, 3200), reduced ? 80 : 760);
   }
 
+  /* ---------- soft narrative hints ---------- */
+  const roomSoftHint = $("#roomSoftHint");
+  let softHintTimer = null;
+
+  function hideSoftHint() {
+    clearTimeout(softHintTimer);
+    softHintTimer = null;
+    if (!roomSoftHint) return;
+    roomSoftHint.classList.remove("is-on");
+    setTimeout(() => {
+      if (roomSoftHint && !roomSoftHint.classList.contains("is-on")) roomSoftHint.hidden = true;
+    }, 500);
+  }
+
+  function showSoftHint(text, key, holdMs = 3200) {
+    if (!roomSoftHint || !text) return;
+    if (key) {
+      if (ledger.hintsSaid[key]) return;
+      ledger.hintsSaid[key] = true;
+      saveLedger();
+    }
+    roomSoftHint.textContent = text;
+    roomSoftHint.hidden = false;
+    requestAnimationFrame(() => roomSoftHint.classList.add("is-on"));
+    clearTimeout(softHintTimer);
+    softHintTimer = setTimeout(() => hideSoftHint(), holdMs);
+  }
+
+  function scheduleRoomGuidance(roomId) {
+    clearTimeout(softHintTimer);
+    softHintTimer = setTimeout(() => {
+      if (activeRoom !== roomId) return;
+      if ((ledger.explored[roomId] || 0) > 0) return;
+      if (roomId === "cafe") showSoftHint("点开有光的地方。", "hint-cafe-glow");
+      else if (roomId === "stair") showSoftHint("对讲灯还亮着。", "hint-stair-bell");
+      else if (roomId === "wait") showSoftHint("椅子还留着形状。", "hint-wait-seat");
+    }, reduced ? 1600 : 4200);
+  }
+
   /* ---------- rooms ---------- */
   const room = $("#room");
   const roomBack = $("#roomBack");
@@ -826,6 +1141,7 @@
     closeMap(true);
     if (toast) { toast.classList.remove("is-on"); toast.hidden = true; }
     leaveWhisperPending = null;
+    hideSoftHint();
     activeRoom = id;
     markVisited(id);
     syncPortals();
@@ -837,11 +1153,17 @@
         f.hidden = true;
         f.classList.remove("is-on");
       });
+      const after = p.querySelector(".room__aftermath");
+      if (after && p.dataset.roomPanel !== id) {
+        after.hidden = true;
+        after.classList.remove("is-on");
+      }
     });
     unlockCallbacks();
     markCollectedFrags();
     applyRoomWhisper(id);
     syncChoiceUI(id);
+    syncEchoes();
     room.hidden = false;
     document.body.classList.add("is-room-open");
     lenis?.stop();
@@ -851,12 +1173,14 @@
     ensureAudio();
     playBootClick();
     if (fragLine) { fragLine.classList.remove("is-on"); fragLine.hidden = true; }
+    scheduleRoomGuidance(id);
   }
 
   function closeRoom() {
     if (!room) return;
     leavingRoomId = activeRoom;
     if (leavingRoomId) reactCorridor(leavingRoomId);
+    hideSoftHint();
     room.classList.remove("is-entering");
     room.classList.add("is-leaving");
     setTimeout(() => {
@@ -866,9 +1190,17 @@
       lenis?.start();
       activeRoom = null;
       $$(".room__panel").forEach((p) => { p.hidden = true; p.classList.remove("is-rack"); });
+      $$(".room__aftermath").forEach((a) => { a.hidden = true; a.classList.remove("is-on"); });
       flushLeaveWhisper();
+      // after a choice, gently remind the dream continues in corridor / other doors
+      if (leavingRoomId && ledger.choices[leavingRoomId] && choiceCount() < 3) {
+        setTimeout(() => {
+          if (!activeRoom) showCorridorWhisper("还有没走完的门。", 2600);
+        }, reduced ? 400 : 3600);
+      }
       leavingRoomId = null;
       applyWakeEnding();
+      syncEchoes();
     }, reduced ? 0 : 720);
   }
 
@@ -911,7 +1243,10 @@
     const noteExplore = () => {
       const panel = btn.closest(".room__panel");
       const roomId = panel?.dataset.roomPanel || activeRoom;
-      if (roomId) bumpExplore(roomId, btn.dataset.shard || btn.dataset.line || btn.style.cssText);
+      if (roomId) {
+        bumpExplore(roomId, btn.dataset.shard || btn.dataset.line || btn.style.cssText);
+        hideSoftHint();
+      }
     };
     const tryCollect = () => {
       const shardId = btn.dataset.shard;
@@ -920,6 +1255,8 @@
         ensureAudio();
         playSoftChime();
         refreshTally();
+        syncEchoes();
+        applyWakeEnding();
         return true;
       }
       return false;
@@ -986,6 +1323,7 @@
       syncEchoes();
       ensureAudio();
       playSoftChime();
+      hideSoftHint();
 
       if (fragLine) {
         const whisperLine = CHOICE_WHISPER[roomId]?.[choice];
@@ -993,8 +1331,19 @@
           fragLine.textContent = whisperLine;
           fragLine.hidden = false;
           fragLine.classList.add("is-on");
+          setTimeout(() => {
+            if (fragLine && fragLine.classList.contains("is-on")) {
+              fragLine.classList.remove("is-on");
+              setTimeout(() => {
+                if (fragLine && !fragLine.classList.contains("is-on")) fragLine.hidden = true;
+              }, 400);
+            }
+          }, reduced ? 900 : 2200);
         }
       }
+
+      // 后果 beat — short aftermath before leaving
+      setTimeout(() => showAftermath(roomId, choice), reduced ? 200 : 700);
 
       if (choice === "intercom") {
         playIntercom();
@@ -1080,10 +1429,18 @@
   /* ---------- replay / reset dream ---------- */
   function resetDream() {
     ledger = blankLedger();
-    try { sessionStorage.removeItem(LEDGER_KEY); } catch { /* */ }
+    try {
+      sessionStorage.removeItem(LEDGER_KEY);
+      sessionStorage.removeItem("dreamcore-ledger-v1");
+    } catch { /* */ }
     leaveWhisperPending = null;
-    $$(".frag").forEach((b) => b.classList.remove("is-collected", "is-on", "is-unlocked"));
+    hideSoftHint();
+    $$(".frag").forEach((b) => {
+      b.classList.remove("is-collected", "is-on", "is-unlocked");
+      if (b.classList.contains("frag--callback")) b.hidden = true;
+    });
     $$(".room__choice").forEach((d) => { d.hidden = true; d.classList.remove("is-on"); });
+    $$(".room__aftermath").forEach((d) => { d.hidden = true; d.classList.remove("is-on"); });
     $$(".room__whisper").forEach((el) => {
       el.textContent = el.dataset.whisperDefault || el.textContent;
     });
@@ -1092,8 +1449,16 @@
     });
     $$(".echo").forEach((el) => {
       if (el.dataset.echoBase) el.dataset.echo = el.dataset.echoBase;
-      el.classList.remove("is-altered");
+      el.classList.remove("is-altered", "is-story-on");
+      if (el.classList.contains("echo--story")) el.hidden = true;
     });
+    const sentence = $("#echoSentence");
+    if (sentence) {
+      sentence.textContent = "今晚……";
+      sentence.classList.remove("is-complete");
+    }
+    const caption = $("#echoesCaption");
+    if (caption) caption.textContent = "墙上留下的，不一定是你写的。";
     syncStoryUI();
   }
 
