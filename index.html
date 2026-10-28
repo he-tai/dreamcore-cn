@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="中式梦核 · 概念站 — 你好像来过这里，但记不起是第几次。" />
+  <meta name="theme-color" content="#080908" />
+  <meta name="robots" content="index,follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="中式梦核" />
+  <meta property="og:description" content="你好像来过这里，但记不起是第几次。" />
+  <meta property="og:image" content="assets/og.jpg" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="中式梦核" />
+  <meta name="twitter:description" content="你好像来过这里，但记不起是第几次。" />
+  <meta name="twitter:image" content="assets/og.jpg" />
+  <title>中式梦核</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="preload" href="assets/v5/corridor-hero.webp" as="image" type="image/webp" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="letterbox" aria-hidden="true"><span></span><span></span></div>
+  <div class="leak" id="lightLeak" aria-hidden="true"></div>
+  <div class="scan" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <div class="chrome">
+    <p class="chapter-mark" id="chapterMark" aria-hidden="true"></p>
+    <button type="button" class="map-toggle" id="mapToggle" aria-label="打开记忆图" title="记忆图">门牌</button>
+    <button type="button" class="mute" id="mute" aria-pressed="true" aria-label="静音">
+      <span class="mute__label">静音</span>
+      <canvas class="mute__eq" id="eqCanvas" width="36" height="12" aria-hidden="true"></canvas>
+    </button>
+  </div>
+
+  <!-- ① 入梦 -->
+  <section class="act act--enter" id="enter" data-chapter="入梦">
+    <div class="enter">
+      <picture class="enter__plate">
+        <source srcset="assets/v5/blackboard.webp" type="image/webp" />
+        <img src="assets/v5/blackboard.jpg" alt="" width="1280" height="720" fetchpriority="high" decoding="async" />
+      </picture>
+      <picture class="enter__dust">
+        <source srcset="assets/v5/chalk-dust.webp" type="image/webp" />
+        <img src="assets/v5/chalk-dust.jpg" alt="" width="1280" height="720" decoding="async" />
+      </picture>
+      <div class="enter__veil" aria-hidden="true"></div>
+      <div class="enter__flicker" id="enterFlicker" aria-hidden="true"></div>
+      <div class="enter__caption">
+        <p class="enter__eyebrow">中式梦核</p>
+        <p class="enter__thesis" id="thesis" aria-live="polite"></p>
+        <button type="button" class="enter__go" id="enterGo">往下走</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 走廊 · 电影卷轴 -->
+  <section class="act act--corridor" id="corridor" data-chapter="走廊">
+    <div class="corridor__sticky">
+      <div class="corridor__stage" id="corridorStage">
+        <div class="corridor__stack" id="corridorStack">
+          <picture class="corridor__plate corridor__plate--hero" data-layer="0">
+            <source srcset="assets/v5/corridor-hero.webp" type="image/webp" />
+            <img src="assets/v5/corridor-hero.jpg" alt="空无的学校走廊" width="1280" height="720" decoding="async" />
+          </picture>
+          <picture class="corridor__plate corridor__plate--tile" data-layer="1">
+            <source srcset="assets/v5/tile-reflect.webp" type="image/webp" />
+            <img src="assets/v5/tile-reflect.jpg" alt="" width="1152" height="864" loading="lazy" decoding="async" />
+          </picture>
+          <picture class="corridor__plate corridor__plate--detail" data-layer="2">
+            <source srcset="assets/v5/corridor-detail.webp" type="image/webp" />
+            <img src="assets/v5/corridor-detail.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+          </picture>
+          <picture class="corridor__plate corridor__plate--handle" data-layer="3">
+            <source srcset="assets/v5/handle-close.webp" type="image/webp" />
+            <img src="assets/v5/handle-close.jpg" alt="" width="1152" height="864" loading="lazy" decoding="async" />
+          </picture>
+          <div class="corridor__mist" data-layer="4" aria-hidden="true"></div>
+          <div class="corridor__fluorescent" data-layer="5" aria-hidden="true"></div>
+        </div>
+
+        <div class="corridor__doors" id="corridorDoors">
+          <button type="button" class="portal" data-room="cafe" style="--px:28%;--py:46%" aria-label="进入网吧">
+            <span class="portal__ring"></span>
+            <span class="portal__cap">网吧</span>
+          </button>
+          <button type="button" class="portal" data-room="stair" style="--px:52%;--py:44%" aria-label="进入楼道">
+            <span class="portal__ring"></span>
+            <span class="portal__cap">楼道</span>
+          </button>
+          <button type="button" class="portal" data-room="wait" style="--px:74%;--py:47%" aria-label="进入候车室">
+            <span class="portal__ring"></span>
+            <span class="portal__cap">候车室</span>
+          </button>
+        </div>
+
+        <div class="corridor__captions" id="corridorCaptions" aria-hidden="true">
+          <p class="scrub-cap" data-cap="0">灯管还在响。</p>
+          <p class="scrub-cap" data-cap="1">绿墙比记忆里更绿。</p>
+          <p class="scrub-cap" data-cap="2">有光的门，不一定开得了。</p>
+        </div>
+        <p class="corridor__whisper" id="corridorWhisper" hidden></p>
+        <p class="corridor__hint" id="corridorHint">缓缓向下 · 靠近有光的门</p>
+      </div>
+    </div>
+    <div class="corridor__spacer" aria-hidden="true"></div>
+  </section>
+
+  <!-- 入室 overlay -->
+  <div class="room" id="room" hidden>
+    <div class="room__iris" id="roomIris" aria-hidden="true"></div>
+    <button type="button" class="room__back" id="roomBack">…回走廊</button>
+    <div class="room__scene" id="roomScene">
+
+      <article class="room__panel" data-room-panel="cafe" hidden>
+        <div class="room__parallax" data-depth="0">
+          <picture class="room__bg">
+            <source srcset="assets/v5/cafe.webp" type="image/webp" />
+            <img src="assets/v5/cafe.jpg" alt="空无的网吧" width="1280" height="720" />
+          </picture>
+        </div>
+        <div class="room__focus" data-depth="0.18" data-focus="crt" hidden>
+          <picture>
+            <source srcset="assets/v5/crt-close.webp" type="image/webp" />
+            <img src="assets/v5/crt-close.jpg" alt="" width="1152" height="864" />
+          </picture>
+        </div>
+        <div class="room__haze room__haze--blue" data-depth="0.28" aria-hidden="true"></div>
+        <div class="room__props" data-depth="0.5">
+          <button type="button" class="frag" style="--hx:24%;--hy:40%" data-line="屏保还在跑。谁的号挂着？" data-focus="crt"><span></span></button>
+          <button type="button" class="frag" style="--hx:66%;--hy:36%" data-line="键帽发黄。昨天的热度还在。" data-focus="crt"><span></span></button>
+          <button type="button" class="frag" style="--hx:46%;--hy:64%" data-line="风扇声盖过了一切。"><span></span></button>
+          <button type="button" class="frag" style="--hx:78%;--hy:56%" data-line="还挂着。没人回。"><span></span></button>
+          <button type="button" class="frag" style="--hx:14%;--hy:72%" data-line="烟灰缸里还有昨天。"><span></span></button>
+        </div>
+        <header class="room__museum">
+          <h2>网吧</h2>
+          <p>屏幕还亮着。没有人坐在那里。</p>
+        </header>
+      </article>
+
+      <article class="room__panel" data-room-panel="stair" hidden>
+        <div class="room__parallax" data-depth="0">
+          <picture class="room__bg">
+            <source srcset="assets/v5/stairwell.webp" type="image/webp" />
+            <img src="assets/v5/stairwell.jpg" alt="单元楼道" width="1280" height="720" />
+          </picture>
+        </div>
+        <div class="room__focus" data-depth="0.16" data-focus="intercom" hidden>
+          <picture>
+            <source srcset="assets/v5/intercom-close.webp" type="image/webp" />
+            <img src="assets/v5/intercom-close.jpg" alt="" width="864" height="1152" />
+          </picture>
+        </div>
+        <div class="room__haze room__haze--amber" data-depth="0.24" aria-hidden="true"></div>
+        <div class="room__props" data-depth="0.48">
+          <button type="button" class="frag" style="--hx:38%;--hy:42%" data-line="叮——有人按过。" data-focus="intercom" data-sfx="intercom"><span></span></button>
+          <button type="button" class="frag" style="--hx:72%;--hy:48%" data-line="信箱是空的。锈还在。"><span></span></button>
+          <button type="button" class="frag" style="--hx:18%;--hy:58%" data-line="防盗窗外是夜。"><span></span></button>
+          <button type="button" class="frag" style="--hx:54%;--hy:68%" data-line="哪一户的灯，是你按的？"><span></span></button>
+        </div>
+        <header class="room__museum">
+          <h2>楼道</h2>
+          <p>你按过哪一户？灯还是亮的。</p>
+        </header>
+      </article>
+
+      <article class="room__panel" data-room-panel="wait" hidden>
+        <div class="room__parallax" data-depth="0">
+          <picture class="room__bg">
+            <source srcset="assets/v5/waiting.webp" type="image/webp" />
+            <img src="assets/v5/waiting.jpg" alt="候车室" width="1280" height="720" />
+          </picture>
+        </div>
+        <div class="room__haze room__haze--cold" data-depth="0.26" aria-hidden="true"></div>
+        <div class="room__props" data-depth="0.5">
+          <button type="button" class="frag" style="--hx:70%;--hy:28%" data-line="末班。或者更晚。"><span></span></button>
+          <button type="button" class="frag" style="--hx:32%;--hy:38%" data-line="玻璃上的雾。有人呼过气。"><span></span></button>
+          <button type="button" class="frag" style="--hx:48%;--hy:68%" data-line="位子还在。人不在。"><span></span></button>
+          <button type="button" class="frag" style="--hx:16%;--hy:52%" data-line="广播里只有沙沙声。"><span></span></button>
+          <button type="button" class="frag" style="--hx:82%;--hy:62%" data-line="时刻表褪成了灰。"><span></span></button>
+        </div>
+        <header class="room__museum">
+          <h2>候车室</h2>
+          <p>位子还在。人不在。</p>
+        </header>
+      </article>
+    </div>
+    <p class="room__fragline" id="fragLine" hidden></p>
+  </div>
+
+  <!-- ③ 记忆图 -->
+  <section class="act act--memory" id="memory" data-chapter="记忆图">
+    <div class="memory">
+      <div class="memory__sheet">
+        <picture class="memory__plate">
+          <source srcset="assets/v5/memory-map.webp" type="image/webp" />
+          <img src="assets/v5/memory-map.jpg" alt="褪色的学校平面图" width="1280" height="720" loading="lazy" decoding="async" />
+        </picture>
+        <div class="memory__hotspots">
+          <button type="button" class="memspot" data-jump="corridor" style="--mx:48%;--my:42%" aria-label="走廊">走廊</button>
+          <button type="button" class="memspot" data-jump="cafe" style="--mx:22%;--my:28%" aria-label="网吧">网吧</button>
+          <button type="button" class="memspot" data-jump="stair" style="--mx:48%;--my:26%" aria-label="楼道">楼道</button>
+          <button type="button" class="memspot" data-jump="wait" style="--mx:74%;--my:28%" aria-label="候车室">候车室</button>
+          <button type="button" class="memspot" data-jump="echoes" style="--mx:30%;--my:68%" aria-label="教室残响">教室</button>
+          <button type="button" class="memspot memspot--soft" data-jump="wake" style="--mx:78%;--my:72%" aria-label="车棚·醒来">车棚</button>
+        </div>
+      </div>
+      <header class="memory__label">
+        <p class="memory__eyebrow">记忆图</p>
+        <p class="memory__thesis">门牌还在。楼层对不上。</p>
+        <p class="memory__hint">点开一间 · 或继续向下</p>
+      </header>
+    </div>
+  </section>
+
+  <!-- memory overlay (from chrome toggle) -->
+  <div class="map-overlay" id="mapOverlay" hidden>
+    <button type="button" class="map-overlay__close" id="mapClose">关掉</button>
+    <div class="map-overlay__card">
+      <picture class="map-overlay__plate">
+        <source srcset="assets/v5/memory-map.webp" type="image/webp" />
+        <img src="assets/v5/memory-map.jpg" alt="记忆图" width="1280" height="720" />
+      </picture>
+      <div class="memory__hotspots memory__hotspots--overlay">
+        <button type="button" class="memspot" data-jump="corridor" style="--mx:48%;--my:42%" aria-label="走廊">走廊</button>
+        <button type="button" class="memspot" data-jump="cafe" style="--mx:22%;--my:28%" aria-label="网吧">网吧</button>
+        <button type="button" class="memspot" data-jump="stair" style="--mx:48%;--my:26%" aria-label="楼道">楼道</button>
+        <button type="button" class="memspot" data-jump="wait" style="--mx:74%;--my:28%" aria-label="候车室">候车室</button>
+        <button type="button" class="memspot" data-jump="echoes" style="--mx:30%;--my:68%" aria-label="教室">教室</button>
+        <button type="button" class="memspot memspot--soft" data-jump="wake" style="--mx:78%;--my:72%" aria-label="车棚">车棚</button>
+      </div>
+      <p class="map-overlay__cap">记忆图 · 非线性</p>
+    </div>
+  </div>
+
+  <!-- ④ 残响 -->
+  <section class="act act--echoes" id="echoes" data-chapter="残响">
+    <div class="echoes">
+      <picture class="echoes__bg">
+        <source srcset="assets/v5/blackboard.webp" type="image/webp" />
+        <img src="assets/v5/blackboard.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+      </picture>
+      <div class="echoes__veil" aria-hidden="true"></div>
+      <div class="echoes__board">
+        <aside class="echo" style="--ex:14%;--ey:20%" tabindex="0" data-echo="那串钥匙，后来呢？">记得带钥匙</aside>
+        <aside class="echo echo--soft" style="--ex:66%;--ey:24%" tabindex="0" data-echo="回头会看见谁？">别回头</aside>
+        <aside class="echo echo--chalk" style="--ex:30%;--ey:48%" tabindex="0" data-echo="数不清。也许不该数。">第几次了？</aside>
+        <aside class="echo echo--mono" style="--ex:54%;--ey:56%" tabindex="0" data-echo="光标还在跳。">你还醒着吗_</aside>
+        <aside class="echo echo--soft" style="--ex:76%;--ey:64%" tabindex="0" data-echo="站台空着。灯还亮。">车晚点了</aside>
+        <aside class="echo echo--chalk echo--faint" style="--ex:20%;--ey:72%" tabindex="0" data-echo="漆皮起了泡。还是那味。">绿墙还在</aside>
+        <picture class="echo echo--photo" style="--ex:44%;--ey:30%" tabindex="0" data-echo="车棚里没有车。">
+          <source srcset="assets/v5/bike-shed.webp" type="image/webp" />
+          <img src="assets/v5/bike-shed.jpg" alt="车棚" width="640" height="360" loading="lazy" />
+        </picture>
+      </div>
+      <p class="echoes__caption">墙上留下的，不一定是你写的。</p>
+      <div class="echoes__toast" id="echoToast" hidden></div>
+    </div>
+  </section>
+
+  <!-- ⑤ 醒来 -->
+  <section class="act act--wake" id="wake" data-chapter="醒来">
+    <div class="wake">
+      <picture class="wake__bg">
+        <source srcset="assets/v5/dawn-wake.webp" type="image/webp" />
+        <img src="assets/v5/dawn-wake.jpg" alt="晨光透过脏玻璃" width="1280" height="720" loading="lazy" decoding="async" />
+      </picture>
+      <div class="wake__bleach" aria-hidden="true"></div>
+      <div class="wake__copy">
+        <p class="wake__line">天亮了。</p>
+        <p class="wake__credit">中式梦核 · 概念站</p>
+        <button type="button" class="wake__replay" id="replay">再入一次</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/vendor/lenis.min.js" defer></script>
+  <script src="assets/vendor/gsap.min.js" defer></script>
+  <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="main.js" defer></script>
+</body>
+</html>
