@@ -1021,7 +1021,8 @@
     const visitedN = Object.keys(ledger.visited).length;
     const { cafe, stair, wait } = ledger.choices;
 
-    if (chainComplete() || (cafe === "login" && stair === "up" && wait && hasShard("stair-ticket") && hasShard("wait-coin"))) {
+    // Full travel chain (choices) closes the loop; shard trio is the richer same ending.
+    if (chainComplete() || (cafe === "login" && stair === "up" && wait)) {
       return "loop";
     }
     if (cafe === "fan" && stair === "up" && wait === "wipe") return "stay";
