@@ -991,8 +991,10 @@
     const sentence = $("#echoSentence");
     if (sentence) {
       let text = "今晚……";
-      if (chainComplete() || (choiceCount() >= 3 && ledger.choices.cafe === "login")) {
-        text = ledger.choices.wait === "wipe" || ledger.choices.cafe === "fan"
+      const { cafe, stair, wait } = ledger.choices;
+      const stayPath = cafe === "fan" && stair === "up" && wait === "wipe";
+      if (chainComplete() || (choiceCount() >= 3 && cafe === "login") || stayPath) {
+        text = stayPath || wait === "wipe" || cafe === "fan"
           ? "今晚本该走。你回来了。"
           : "今晚本该走。你没走。";
       } else if (choiceCount() >= 2 || (hasShard("stair-ticket") && hasShard("wait-coin"))) {
