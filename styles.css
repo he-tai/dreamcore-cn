@@ -656,6 +656,45 @@ body.is-corridor-captioning .corridor__whisper {
   background: rgba(8, 9, 8, 0.62);
 }
 
+.room__aftermath {
+  position: absolute; left: 50%; bottom: max(96px, calc(var(--letterbox) + 72px));
+  transform: translateX(-50%) translateY(6px);
+  z-index: 12; width: min(26rem, 88vw);
+  text-align: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+.room__aftermath.is-on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.room__aftermath[hidden] { display: none !important; }
+.room__aftermath-beat {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  letter-spacing: 0.16em;
+  line-height: 1.75;
+  color: var(--ink);
+  text-shadow: 0 2px 22px rgba(0,0,0,0.85);
+  margin-bottom: 0.7rem;
+}
+.room__aftermath-hint {
+  font-family: var(--sans); font-weight: 300; font-size: 10px;
+  letter-spacing: 0.36em; color: var(--ink-faint);
+}
+
+.room__soft-hint {
+  position: absolute; left: 50%; bottom: max(48px, calc(var(--letterbox) + 28px));
+  transform: translateX(-50%);
+  z-index: 11;
+  font-family: var(--sans); font-weight: 300; font-size: 11px;
+  letter-spacing: 0.4em; color: var(--ink-faint);
+  text-shadow: 0 2px 16px rgba(0,0,0,0.75);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.9s var(--ease);
+}
+.room__soft-hint.is-on { opacity: 1; }
+.room__soft-hint[hidden] { display: none !important; }
+
 /* —— 记忆图 —— */
 .act--memory {
   min-height: 100vh;
@@ -741,6 +780,18 @@ body.is-corridor-captioning .corridor__whisper {
   border-color: rgba(200, 232, 168, 0.22);
   color: var(--ink);
 }
+.echo--story {
+  opacity: 0;
+  pointer-events: none;
+  border-color: rgba(212, 165, 116, 0.2);
+  transition: opacity 0.8s var(--ease), transform 0.35s var(--ease), color 0.3s, border-color 0.3s;
+}
+.echo--story.is-story-on,
+.echo--story:not([hidden]) {
+  opacity: 0.92;
+  pointer-events: auto;
+}
+.echo--story[hidden] { display: none !important; }
 .memory__label {
   text-align: center;
   max-width: 28rem;
@@ -851,6 +902,24 @@ body.is-touch .echo { cursor: pointer; }
   box-shadow: 0 8px 28px rgba(0,0,0,0.45);
 }
 .echo--photo img { aspect-ratio: 16/9; object-fit: cover; }
+.echoes__sentence {
+  position: absolute; left: 50%; top: 11%;
+  transform: translateX(-50%);
+  z-index: 3;
+  font-family: var(--serif); font-weight: 300;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  letter-spacing: 0.28em;
+  color: rgba(230, 226, 214, 0.5);
+  text-shadow: 0 2px 20px rgba(0,0,0,0.7);
+  text-align: center;
+  width: min(28rem, 90vw);
+  transition: color 0.8s, letter-spacing 0.8s;
+  pointer-events: none;
+}
+.echoes__sentence.is-complete {
+  color: rgba(200, 232, 168, 0.72);
+  letter-spacing: 0.2em;
+}
 .echoes__caption {
   position: relative; z-index: 2; margin-top: 62vh;
   font-family: var(--sans); font-weight: 300; font-size: 12px;
@@ -891,6 +960,9 @@ body.is-touch .echo { cursor: pointer; }
 .wake__copy {
   position: relative; z-index: 2; text-align: center; padding: 24px;
 }
+.wake__verses {
+  margin-bottom: 1.6rem;
+}
 .wake__line {
   font-size: clamp(1.5rem, 4vw, 2.2rem); letter-spacing: 0.45em;
   margin-bottom: 0.7rem;
@@ -901,9 +973,10 @@ body.is-touch .echo { cursor: pointer; }
 .wake__sub {
   font-family: var(--sans); font-weight: 300; font-size: 12px;
   letter-spacing: 0.28em; color: rgba(30, 28, 24, 0.5);
-  margin-bottom: 1.4rem;
-  min-height: 1.2em;
+  margin-bottom: 0.55rem;
+  line-height: 1.7;
 }
+.wake__sub:last-child { margin-bottom: 0; }
 .wake.is-bleach .wake__sub { color: rgba(20, 18, 14, 0.45); }
 .wake__credit {
   font-family: var(--sans); font-weight: 300; font-size: 11px;
@@ -924,7 +997,10 @@ body.is-touch .echo { cursor: pointer; }
   .enter__flicker.is-blink { animation: none; opacity: 0.2; }
   .cursor { transition: none; }
   .room__choice,
+  .room__aftermath,
+  .room__soft-hint,
   .frag--callback,
+  .echo--story,
   .memory-tally { transition: none; }
   html { scroll-behavior: auto; }
 }
@@ -945,8 +1021,11 @@ body.is-touch .echo { cursor: pointer; }
   .map-toggle { letter-spacing: 0.28em; }
   .room__focus picture { width: min(78vw, 320px); height: min(50vh, 360px); }
   .chrome { height: 48px; }
-  .room__choice { bottom: max(110px, calc(var(--letterbox) + 88px)); }
+  .room__choice,
+  .room__aftermath { bottom: max(110px, calc(var(--letterbox) + 88px)); }
   .room__choice-btn { font-size: 11px; letter-spacing: 0.12em; padding: 10px 12px; }
+  .room__aftermath-beat { font-size: 0.95rem; letter-spacing: 0.12em; }
+  .echoes__sentence { top: 8%; font-size: 1rem; letter-spacing: 0.18em; }
   .portal__mark { font-size: 7px; letter-spacing: 0.22em; }
 }
 
