@@ -78,7 +78,7 @@
   const CAPTION_AFTER = {
     cafe: {
       login: "有光的门。号登过了。",
-      fan: "风停了。灯管还在嗡。",
+      fan: "风停了。灯管还亮着。",
     },
     stair: {
       intercom: "绿墙潮着。对讲灯还亮。",
@@ -118,7 +118,7 @@
       lines: [
         "你没有走。",
         "风扇停了。对讲静了。雾开了一线。",
-        "梦把你送回同一扇门。",
+        "今晚本该走。梦把你送回同一扇门。",
       ],
     },
   };
@@ -549,83 +549,106 @@
       });
     });
 
+    ScrollTrigger.create({
+      trigger: "#corridor",
+      start: "top bottom",
+      end: "bottom top",
+      onToggle: (self) => document.body.classList.toggle("is-corridor-act", self.isActive),
+    });
+    ScrollTrigger.create({
+      trigger: "#wake",
+      start: "top bottom",
+      end: "bottom top",
+      onToggle: (self) => document.body.classList.toggle("is-wake-act", self.isActive),
+    });
+
     const stack = $("#corridorStack");
     const detail = $(".corridor__plate--detail");
     const tile = $(".corridor__plate--tile");
     const handle = $(".corridor__plate--handle");
     const hint = $("#corridorHint");
     const caps = $$(".scrub-cap");
+    const fluorescent = $(".corridor__fluorescent");
+    if (fluorescent) gsap.set(fluorescent, { opacity: 0.38 });
 
     if (stack) {
       if (reduced) {
-        if (detail) detail.style.opacity = "0.35";
-        if (tile) tile.style.opacity = "0.2";
+        if (detail) detail.style.opacity = "0.28";
+        if (tile) tile.style.opacity = "0.16";
+        if (handle) handle.style.opacity = "0.18";
+        if (fluorescent) fluorescent.style.opacity = "0.32";
       } else {
+        /* Soft peaks + smoother scrub — stacked soft-light + grain must not strobe */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: "#corridor",
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.7,
+            scrub: 1.15,
           },
         });
-        tl.fromTo(stack, { y: "0%" }, { y: "-10%", ease: "none" }, 0)
-          .fromTo(".corridor__plate--hero", { scale: 1.1 }, { scale: 1.0, ease: "none" }, 0)
-          .fromTo(tile, { opacity: 0, x: "4%" }, { opacity: 0.42, x: "-2%", ease: "none" }, 0.08)
-          .fromTo(detail, { opacity: 0, y: "10%" }, { opacity: 0.4, y: "-2%", ease: "none" }, 0.22)
-          .fromTo(handle, { opacity: 0, scale: 1.15 }, { opacity: 0.55, scale: 1.0, ease: "none" }, 0.55)
-          .fromTo(".corridor__mist", { opacity: 0.35 }, { opacity: 0.95, ease: "none" }, 0)
-          .to(hint, { opacity: 0, ease: "none" }, 0.2);
+        tl.fromTo(stack, { y: "0%" }, { y: "-8%", ease: "none" }, 0)
+          .fromTo(".corridor__plate--hero", { scale: 1.08 }, { scale: 1.0, ease: "none" }, 0)
+          .fromTo(tile, { opacity: 0, x: "3%" }, { opacity: 0.28, x: "-1.5%", ease: "none" }, 0.1)
+          .fromTo(detail, { opacity: 0, y: "8%" }, { opacity: 0.26, y: "-1.5%", ease: "none" }, 0.24)
+          .fromTo(handle, { opacity: 0, scale: 1.08 }, { opacity: 0.22, scale: 1.0, ease: "none" }, 0.58)
+          .fromTo(".corridor__mist", { opacity: 0.3 }, { opacity: 0.72, ease: "none" }, 0)
+          .to(hint, { opacity: 0, ease: "none" }, 0.22);
+        if (fluorescent) {
+          /* near-static wash — tiny scrub delta only, never a pulse */
+          tl.fromTo(fluorescent, { opacity: 0.34 }, { opacity: 0.4, ease: "none" }, 0);
+        }
 
         if (caps.length) {
           caps.forEach((cap) => {
             gsap.set(cap, { opacity: 0, y: 0 });
             cap.classList.remove("is-live");
           });
+          /* Pure opacity crossfades — no scrub-tied class call() snaps (those strobed) */
           const capTl = gsap.timeline({
             scrollTrigger: {
               trigger: "#corridor",
               start: "top top",
               end: "bottom bottom",
-              scrub: 0.65,
+              scrub: 1.05,
               onUpdate: (self) => {
-                document.body.classList.toggle("is-corridor-captioning", self.progress > 0.08 && self.progress < 0.92);
+                const live = self.progress > 0.08 && self.progress < 0.9;
+                document.body.classList.toggle("is-corridor-captioning", live);
+                caps.forEach((cap, i) => {
+                  const slots = [
+                    [0.10, 0.30],
+                    [0.34, 0.54],
+                    [0.58, 0.78],
+                  ];
+                  const [a, d] = slots[i] || slots[slots.length - 1];
+                  cap.classList.toggle("is-live", self.progress >= a && self.progress <= d);
+                });
               },
             },
           });
           const slots = [
-            [0.10, 0.14, 0.26, 0.30],
-            [0.34, 0.38, 0.50, 0.54],
-            [0.58, 0.62, 0.74, 0.78],
+            [0.10, 0.16, 0.24, 0.30],
+            [0.34, 0.40, 0.48, 0.54],
+            [0.58, 0.64, 0.72, 0.78],
           ];
           caps.forEach((cap, i) => {
             const [a, b, c, d] = slots[i] || slots[slots.length - 1];
-            capTl.call(() => {
-              caps.forEach((other) => {
-                if (other !== cap) {
-                  other.classList.remove("is-live");
-                  gsap.set(other, { opacity: 0 });
-                }
-              });
-              cap.classList.add("is-live");
-            }, null, a);
-            capTl.fromTo(cap, { opacity: 0, y: 10 }, { opacity: 1, y: 0, ease: "none", duration: b - a }, a);
-            capTl.to(cap, { opacity: 0, y: -8, ease: "none", duration: d - c }, c);
-            capTl.call(() => { cap.classList.remove("is-live"); }, null, d);
+            capTl.fromTo(cap, { opacity: 0, y: 6 }, { opacity: 1, y: 0, ease: "none", duration: b - a }, a);
+            capTl.to(cap, { opacity: 0, y: -5, ease: "none", duration: d - c }, c);
           });
         }
       }
     }
 
     if (!reduced) {
-      gsap.fromTo(".portal", { opacity: 0.08 }, {
-        opacity: 0.42,
-        stagger: 0.1,
+      gsap.fromTo(".portal", { opacity: 0.12 }, {
+        opacity: 0.36,
+        stagger: 0.08,
         scrollTrigger: {
           trigger: "#corridor",
           start: "top top",
-          end: "35% top",
-          scrub: true,
+          end: "40% top",
+          scrub: 1.1,
         },
       });
 
