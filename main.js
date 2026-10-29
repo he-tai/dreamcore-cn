@@ -7,54 +7,54 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  const THESIS = "你好像来过这里，但记不起是第几次。";
+  const THESIS = "今晚本该走。灯管的嗡声，你认得。";
   const LEDGER_KEY = "dreamcore-ledger-v2";
   const SHARD_TOTAL = 10;
 
-  /* ---------- story copy · 没走成的那一晚 ---------- */
+  /* ---------- story copy · 没走成的那一晚 · 感官加厚 ---------- */
   const CHOICE_WHISPER = {
     cafe: {
-      login: "那台机器认识你。卡号亮了一下。",
-      fan: "风扇停了。聊天窗口更清楚——我马上到。",
+      login: "键帽凹痕贴着指腹。卡号亮了一下。",
+      fan: "吊扇停了。显卡还在叫。聊天停在：我马上到。",
     },
     stair: {
-      intercom: "铃在空楼里散开。没有脚步。",
-      up: "口袋沉了一下。一枚硬币。",
+      intercom: "对讲嘶了一声。空楼里没有脚步。",
+      up: "口袋沉了一下。一枚还温的硬币。",
     },
     wait: {
-      sit: "你坐下。形状对上了。车仍不来。",
-      wipe: "雾后是空站台。字还在：走。",
+      sit: "蓝椅接住你。夏末的凉从裤管爬上来。车仍不来。",
+      wipe: "雾开一线。空站台更凉。字还在：等我——",
     },
   };
 
   const AFTERMATH = {
     cafe: {
       login: {
-        beat: "号挂上了。像是你的，又像借来的。有人等你登完再走。",
+        beat: "号挂上了。显卡风扇细细叫。烟灰缸边的烫痕还热。像有人等你登完再走。",
         hint: "回走廊。楼道那盏灯，也许认得这串号。",
       },
       fan: {
-        beat: "风停了。屏幕更刺眼。有人会回来关——或者不会。",
-        hint: "回走廊。还有门缝漏着光。",
+        beat: "吊扇停了。显卡还在叫。脚边瘪着方便面袋。烟灰缸边有烫痕。聊天更清楚：我马上到。",
+        hint: "回走廊。门缝还漏着蓝光。",
       },
     },
     stair: {
       intercom: {
-        beat: "再按一次。对讲里只有电流。四楼的灯颤了一下。",
-        hint: "回走廊。梦还没做完。",
+        beat: "再按一次。对讲里只有嘶嘶的电流。四楼的灯晚半拍，颤了一下。",
+        hint: "回走廊。感应灯还没灭干净。",
       },
       up: {
-        beat: "你没下楼。台阶往上更暗。硬币在掌心还温。",
-        hint: "回走廊。候车室也许用得着它。",
+        beat: "你没下楼。潮绿墙贴着手肘。台阶往上更暗。硬币在掌心还温。",
+        hint: "回走廊。候车室的玻璃，也许用得着它。",
       },
     },
     wait: {
       sit: {
-        beat: "蓝椅接住你。广播沙沙响。这一晚，车没有开过来。",
-        hint: "回走廊。或者向下，去把字拼完。",
+        beat: "蓝椅凹痕对上了。广播只剩沙沙。玻璃外站台空着。这一晚，车没有开过来。",
+        hint: "回走廊。或者向下，去把墙上的字拼完。",
       },
       wipe: {
-        beat: "雾开一线。外面空着。玻璃上未写完的字，露出来了。",
+        beat: "指腹擦开雾。外面空站台更凉。玻璃上未写完的字露出来：等我——",
         hint: "回走廊。残响里也许能读全。",
       },
     },
@@ -63,59 +63,63 @@
   const CORRIDOR_AFTER = {
     cafe: {
       login: "还亮着的那台，登过了。卡号跟着你。",
-      fan: "风扇停了。网吧更安静。像有人刚起身。",
+      fan: "吊扇停了。显卡还在叫。像有人刚起身。",
     },
     stair: {
-      intercom: "对讲里没人接。灯还亮着。",
+      intercom: "对讲里没人接。电流还嘶着。",
       up: "硬币还温。往上的灯更暗。",
     },
     wait: {
-      sit: "椅子留着你的温度。车没来。",
+      sit: "蓝椅留着你的温度。车没来。",
       wipe: "雾开了。未写完的字，还在玻璃上。",
     },
   };
 
   const CAPTION_AFTER = {
     cafe: {
-      login: "有光的门，有人登过号。",
-      fan: "风停了。灯管还在响。",
+      login: "有光的门。号登过了。",
+      fan: "风停了。灯管还在嗡。",
     },
     stair: {
-      intercom: "绿墙旁，对讲灯还亮。",
-      up: "绿墙往上，口袋里有硬币。",
+      intercom: "绿墙潮着。对讲灯还亮。",
+      up: "绿墙往上。口袋里有硬币。",
     },
     wait: {
-      sit: "有光的门，车还没来。",
+      sit: "有光的门。车还没来。",
       wipe: "雾散了一线。字还没写完。",
     },
   };
 
   const WAKE_VARIANTS = {
     dawn: {
-      lines: ["天亮了。", "你什么也没带上。", "像从没打算走。"],
+      lines: ["天亮了。", "口袋是空的。", "像从没打算走。"],
     },
     forgot: {
-      lines: ["几乎忘了。", "绿墙还在。", "那晚的门，没关上。"],
+      lines: ["几乎忘了。", "绿墙还潮。", "那晚的门，没关上。"],
     },
     more: {
-      lines: ["记得更多。", "三处的灯都亮过。", "还是没走到外面。"],
+      lines: ["记得更多。", "蓝光、潮墙、空站台。", "还是没走到外面。"],
     },
     waiting: {
-      lines: ["有人在等。", "蓝椅是空的。你不在。", "车开过了。或者没有。"],
+      lines: ["蓝椅是空的。", "你不在。广播沙沙响。", "车开过了。或者没有。"],
     },
     lights: {
-      lines: ["灯还没关。", "像有人刚走。", "又像你还坐在那里。"],
+      lines: ["灯还没关。", "显卡还在叫。对讲还嘶着。", "又像你还坐在那里。"],
     },
     loop: {
       lines: [
         "卡号、硬币、未写完的字。",
-        "这一次，链条接上了。",
-        "天亮了。走廊还亮着。",
-        "你好像还会再来。",
+        "还是没出门。",
+        "天亮了。走廊的灯管还在嗡。",
+        "口袋里有热度。",
       ],
     },
     stay: {
-      lines: ["你没有走。", "风扇关了。对讲静了。雾开了。", "梦把你送回同一扇门。"],
+      lines: [
+        "你没有走。",
+        "风扇停了。对讲静了。雾开了一线。",
+        "梦把你送回同一扇门。",
+      ],
     },
   };
 
@@ -667,25 +671,25 @@
 
   function portalWhisperFor(roomId) {
     if (roomId === "cafe") {
-      if (ledger.choices.cafe === "login") return "那台机器，号还挂着。";
-      if (ledger.choices.cafe === "fan") return "风扇停了。蓝光还在。";
-      if (ledger.visited.stair) return "楼道之后——蓝光从门缝漏出来。";
+      if (ledger.choices.cafe === "login") return "那台机器，号还挂着。显卡还在叫。";
+      if (ledger.choices.cafe === "fan") return "吊扇停了。蓝光还烫。";
+      if (ledger.visited.stair) return "潮墙之后——蓝光从门缝漏出来。";
       if (ledger.visited.wait) return "车没来。网吧倒还亮。";
-      return "蓝光从门缝漏出来。";
+      return "蓝光从门缝漏出来。有一股泡面味。";
     }
     if (roomId === "stair") {
       if (ledger.choices.cafe === "login") return "对讲灯还亮。像记得那串号。";
       if (ledger.choices.stair === "up") return "往上更暗。硬币还温。";
-      if (ledger.visited.cafe && !ledger.choices.cafe) return "网吧还亮着。这边灯也没关。";
+      if (ledger.visited.cafe && !ledger.choices.cafe) return "网吧还亮着。这边感应灯也没关。";
       if (ledger.visited.wait) return "站台空着。单元门的灯还亮。";
-      return "对讲灯还亮着。";
+      return "对讲灯还亮着。绿墙潮着。";
     }
     if (roomId === "wait") {
       if (ledger.choices.stair === "up") return "口袋里有硬币。车还没来。";
       if (ledger.choices.cafe === "login") return "号挂着。车不会等。";
       if (ledger.visited.stair) return "对讲没人接。车也许也不来。";
-      if (ledger.visited.cafe) return "蓝光还在眼里。候车室更冷。";
-      return "车还没来。也许永远不来。";
+      if (ledger.visited.cafe) return "蓝光还在眼里。候车室的玻璃更凉。";
+      return "车还没来。玻璃外站台空着。";
     }
     return "";
   }
@@ -723,16 +727,16 @@
     const base = $(`.room__panel[data-room-panel="${roomId}"] .room__whisper`)?.dataset.whisperDefault || "";
     if (roomId === "cafe") {
       if (visitedBefore("cafe", "stair") && visitedBefore("cafe", "wait")) {
-        return "两处都空着。只有这台还挂着。";
+        return "两处都空着。只有这台还挂着。泡面味还在。";
       }
       if (visitedBefore("cafe", "stair")) {
         if (ledger.choices.stair === "intercom") return "对讲没人接。你才跑到还亮着的机器前。";
-        if (ledger.choices.stair === "up") return "硬币还在口袋。屏幕倒认识你。";
-        return "楼道的灯还亮。网吧的蓝光更亮。";
+        if (ledger.choices.stair === "up") return "硬币还在口袋。屏幕的蓝光倒认识你。";
+        return "楼道的潮味还在袖口。网吧的蓝光更烫。";
       }
       if (visitedBefore("cafe", "wait")) {
         if (ledger.choices.wait === "sit") return "你刚从空椅子起来。号还挂着。";
-        return "车没来。屏幕倒还亮着。";
+        return "车没来。屏幕倒还亮着。显卡细细叫。";
       }
       return base || "今晚本该走。机器还亮着。";
     }
@@ -741,13 +745,13 @@
         return "蓝光还留在眼睛里。对讲灯也亮。像同一件事。";
       }
       if (ledger.choices.cafe === "fan") {
-        return "风停之后，楼道更响。有人按过。";
+        return "风停之后，楼道更响。感应灯晚半拍。有人按过。";
       }
       if (visitedBefore("stair", "cafe")) {
-        return "网吧门缝漏着光。这边——对讲灯也没关。";
+        return "网吧门缝漏着光。这边——对讲灯也没关。绿墙潮着。";
       }
       if (visitedBefore("stair", "wait")) {
-        return "车没来。你又回到单元门。";
+        return "站台的凉还在指尖。你又回到单元门。";
       }
       return base || "有人按过。灯还亮着。没人应。";
     }
@@ -756,19 +760,19 @@
         return "卡号和硬币都在。位子还凹着。像专等你来写完。";
       }
       if (ledger.choices.cafe === "login") {
-        return "那台机器还挂着号。车不会等。";
+        return "那台机器还挂着号。车不会等。玻璃外更凉。";
       }
       if (ledger.choices.stair === "intercom") {
         return "对讲没人接。也许车也不会来。";
       }
       if (ledger.choices.stair === "up") {
-        return "口袋里的硬币还温。蓝椅空着。";
+        return "口袋里的硬币还温。蓝椅空着。夏末的静。";
       }
       if (visitedBefore("wait", "cafe") && !visitedBefore("wait", "stair")) {
-        return "你先看见了蓝光。此刻椅子更空。";
+        return "你先看见了蓝光。此刻椅子更空。玻璃上有雾。";
       }
       if (visitedBefore("wait", "stair")) {
-        return "楼道的回声还在。候车室更冷。";
+        return "楼道的潮味还在。候车室的玻璃更凉。";
       }
       return base || "位子还留着形状。人已经不在。";
     }
@@ -920,14 +924,14 @@
     const letter = $(`.echo[data-echo-id="letter"]`);
 
     if (bus) {
-      const base = bus.dataset.echoBase || "站台空着。灯还亮。";
+      const base = bus.dataset.echoBase || "站台空着。灯还亮。玻璃外更凉。";
       if (ledger.choices.wait === "wipe") {
         bus.textContent = "雾开了";
-        bus.dataset.echo = "雾开了。外面还是空的。字没写完。";
+        bus.dataset.echo = "雾开了。空站台更凉。字没写完。";
         bus.classList.add("is-altered");
       } else if (ledger.choices.wait === "sit") {
         bus.textContent = "有人坐过";
-        bus.dataset.echo = "蓝椅上，形状对过一下。";
+        bus.dataset.echo = "蓝椅上，凹痕对过一下。夏末的静。";
         bus.classList.add("is-altered");
       } else {
         bus.textContent = "车晚点了";
@@ -936,14 +940,14 @@
       }
     }
     if (cursorEcho) {
-      const base = cursorEcho.dataset.echoBase || "光标还在跳。";
+      const base = cursorEcho.dataset.echoBase || "光标还在跳。显卡细细叫。";
       if (ledger.choices.cafe === "login") {
         cursorEcho.textContent = "号还挂着_";
-        cursorEcho.dataset.echo = "号还挂着。你登过。卡号跟着走了。";
+        cursorEcho.dataset.echo = "号还挂着。你登过。卡号还热。";
         cursorEcho.classList.add("is-altered");
       } else if (ledger.choices.cafe === "fan") {
         cursorEcho.textContent = "风停了_";
-        cursorEcho.dataset.echo = "风扇停了。光标还在。我马上到。";
+        cursorEcho.dataset.echo = "吊扇停了。显卡还在叫。我马上到。";
         cursorEcho.classList.add("is-altered");
       } else {
         cursorEcho.textContent = "你还醒着吗_";
@@ -954,32 +958,32 @@
     if (times) {
       const n = ledger.shards.length;
       if (chainComplete()) {
-        times.textContent = "接上了";
-        times.dataset.echo = "卡号、硬币、未写完的字。这一次拼上了。";
+        times.textContent = "还是没出门";
+        times.dataset.echo = "卡号、硬币、未写完的字。还是没出门。";
         times.classList.add("is-altered");
       } else if (choiceCount() >= 2) {
         times.textContent = "还没走";
-        times.dataset.echo = "记得要走。还没走到。";
+        times.dataset.echo = "灯管还在嗡。还没走到外面。";
         times.classList.add("is-altered");
       } else if (n >= 2) {
         times.textContent = "第几次了？";
-        times.dataset.echo = "碎片多了一点。出口还是模糊。";
+        times.dataset.echo = "脚趾记得瓷砖缝。出口还是远。";
         times.classList.remove("is-altered");
       } else {
         times.textContent = "第几次了？";
-        times.dataset.echo = times.dataset.echoBase || "数不清。也许不该数。";
+        times.dataset.echo = times.dataset.echoBase || "数不清。灯管的嗡声，你认得。";
         times.classList.remove("is-altered");
       }
     }
     if (keys) {
       if (ledger.choices.stair === "intercom") {
-        keys.dataset.echo = "钥匙在哪一户？对讲没人答。";
+        keys.dataset.echo = "钥匙在哪一户？对讲里只有嘶嘶声。";
         keys.classList.add("is-altered");
       } else if (ledger.choices.stair === "up") {
-        keys.dataset.echo = "没带钥匙。口袋里只有硬币。";
+        keys.dataset.echo = "没带钥匙。口袋里只有还温的硬币。";
         keys.classList.add("is-altered");
       } else {
-        keys.dataset.echo = "那串钥匙，后来呢？";
+        keys.dataset.echo = "那串钥匙，后来呢？锈味还在。";
         keys.classList.remove("is-altered");
       }
     }
@@ -1010,8 +1014,8 @@
 
     const caption = $("#echoesCaption");
     if (caption) {
-      if (chainComplete()) caption.textContent = "拼出来的句子，像你写的。";
-      else if (choiceCount() >= 1) caption.textContent = "墙上的字，在跟着你改。";
+      if (chainComplete()) caption.textContent = "粉笔灰还沾在指缝。句子像你写的。";
+      else if (choiceCount() >= 1) caption.textContent = "墙上的字，跟着你的脚步改。";
       else caption.textContent = "墙上留下的，不一定是你写的。";
     }
   }
@@ -1125,9 +1129,9 @@
     softHintTimer = setTimeout(() => {
       if (activeRoom !== roomId) return;
       if ((ledger.explored[roomId] || 0) > 0) return;
-      if (roomId === "cafe") showSoftHint("点开有光的地方。", "hint-cafe-glow");
-      else if (roomId === "stair") showSoftHint("对讲灯还亮着。", "hint-stair-bell");
-      else if (roomId === "wait") showSoftHint("椅子还留着形状。", "hint-wait-seat");
+      if (roomId === "cafe") showSoftHint("蓝光还烫。点开有光的地方。", "hint-cafe-glow");
+      else if (roomId === "stair") showSoftHint("对讲灯还亮。绿墙潮着。", "hint-stair-bell");
+      else if (roomId === "wait") showSoftHint("蓝椅还留着凹痕。", "hint-wait-seat");
     }, reduced ? 1600 : 4200);
   }
 
@@ -1198,7 +1202,7 @@
       // after a choice, gently remind the dream continues in corridor / other doors
       if (leavingRoomId && ledger.choices[leavingRoomId] && choiceCount() < 3) {
         setTimeout(() => {
-          if (!activeRoom) showCorridorWhisper("还有没走完的门。", 2600);
+          if (!activeRoom) showCorridorWhisper("灯管还在嗡。还有没走完的门。", 2600);
         }, reduced ? 400 : 3600);
       }
       leavingRoomId = null;

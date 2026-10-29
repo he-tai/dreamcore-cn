@@ -356,9 +356,18 @@ button:focus-visible { outline: 1px solid var(--fluorescent-soft); outline-offse
 }
 .corridor__fluorescent {
   position: absolute; inset: 0; z-index: 6; pointer-events: none;
-  background: radial-gradient(ellipse 50% 20% at 50% 8%, rgba(210, 240, 170, 0.10), transparent 60%);
-  opacity: 0.55;
-  /* no strobe — GSAP/CSS fighting + fluPulse caused chapter-2 flicker */
+  background:
+    radial-gradient(ellipse 50% 20% at 50% 8%, rgba(210, 240, 170, 0.11), transparent 60%),
+    radial-gradient(ellipse 30% 12% at 48% 6%, rgba(200, 230, 160, 0.06), transparent 70%);
+  opacity: 0.58;
+  /* 极慢亮度起伏，像灯管嗡鸣；reduced-motion 下关掉 */
+  animation: lampHum 5.5s ease-in-out infinite;
+}
+@keyframes lampHum {
+  0%, 100% { opacity: 0.5; }
+  40% { opacity: 0.62; }
+  55% { opacity: 0.48; }
+  78% { opacity: 0.6; }
 }
 
 .corridor__doors {
@@ -532,7 +541,23 @@ body.is-corridor-captioning .corridor__whisper {
 .room__haze { pointer-events: none; mix-blend-mode: soft-light; z-index: 3; }
 .room__haze--blue { background: radial-gradient(ellipse at 40% 40%, rgba(80,140,220,0.35), transparent 65%); }
 .room__haze--amber { background: radial-gradient(ellipse at 55% 30%, rgba(220,160,80,0.28), transparent 60%); }
-.room__haze--cold { background: radial-gradient(ellipse at 50% 40%, rgba(140,180,200,0.25), transparent 65%); }
+.room__haze--cold {
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(140,180,200,0.28), transparent 65%),
+    linear-gradient(180deg, rgba(120,160,180,0.08), transparent 45%);
+}
+/* 候车室玻璃冷色 —— 轻量感官线索，非特效 */
+.room__glass-tint {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background:
+    linear-gradient(105deg, rgba(150,190,210,0.07) 0%, transparent 42%, rgba(110,150,170,0.1) 100%),
+    radial-gradient(ellipse 55% 45% at 68% 32%, rgba(180,210,220,0.12), transparent 70%);
+  mix-blend-mode: soft-light;
+  opacity: 0.85;
+}
+.room__panel[data-room-panel="wait"] .room__bg {
+  filter: saturate(0.82) contrast(1.06) brightness(0.8) hue-rotate(-6deg);
+}
 .room__props { z-index: 4; }
 
 .room__museum {
@@ -862,7 +887,15 @@ body.is-corridor-captioning .corridor__whisper {
   position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(8,9,8,0.5), rgba(8,9,8,0.35) 40%, rgba(8,9,8,0.75));
 }
-.echoes__board { position: absolute; inset: 0; }
+/* 残响纸纹 —— 日记感，静止，reduced-motion 下同样存在 */
+.echoes::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.055; mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 220px;
+}
+.echoes__board { position: absolute; inset: 0; z-index: 2; }
 .echo {
   position: absolute; left: var(--ex); top: var(--ey);
   transform: translate(-50%, -50%) rotate(calc(var(--r, -2) * 1deg));
@@ -905,7 +938,7 @@ body.is-touch .echo { cursor: pointer; }
 .echoes__sentence {
   position: absolute; left: 50%; top: 11%;
   transform: translateX(-50%);
-  z-index: 3;
+  z-index: 4;
   font-family: var(--serif); font-weight: 300;
   font-size: clamp(1.05rem, 2.4vw, 1.35rem);
   letter-spacing: 0.28em;
@@ -921,7 +954,7 @@ body.is-touch .echo { cursor: pointer; }
   letter-spacing: 0.2em;
 }
 .echoes__caption {
-  position: relative; z-index: 2; margin-top: 62vh;
+  position: relative; z-index: 3; margin-top: 62vh;
   font-family: var(--sans); font-weight: 300; font-size: 12px;
   letter-spacing: 0.28em; color: var(--ink-faint); text-align: center;
 }
@@ -962,6 +995,13 @@ body.is-touch .echo { cursor: pointer; }
 }
 .wake__verses {
   margin-bottom: 1.6rem;
+  position: relative;
+  padding: 1.1rem 1.35rem 1.25rem;
+  /* 醒来日记纸感 —— 极淡，服务感官而非装饰 */
+  background:
+    linear-gradient(180deg, rgba(232,226,214,0.05), rgba(232,226,214,0.02)),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)' opacity='0.4'/%3E%3C/svg%3E");
+  background-size: auto, 140px;
 }
 .wake__line {
   font-size: clamp(1.5rem, 4vw, 2.2rem); letter-spacing: 0.45em;
@@ -993,7 +1033,8 @@ body.is-touch .echo { cursor: pointer; }
 /* reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .grain, .scan { animation: none; }
-  .corridor__fluorescent { animation: none; }
+  .corridor__fluorescent { animation: none; opacity: 0.55; }
+  .wake__verses { background: rgba(232,226,214,0.03); }
   .enter__flicker.is-blink { animation: none; opacity: 0.2; }
   .cursor { transition: none; }
   .room__choice,
