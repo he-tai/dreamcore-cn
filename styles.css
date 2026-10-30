@@ -101,18 +101,23 @@ button:focus-visible { outline: 1px solid var(--fluorescent-soft); outline-offse
 /* —— overlays —— */
 .grain {
   position: fixed; inset: 0; z-index: 90; pointer-events: none;
-  opacity: 0.085; mix-blend-mode: overlay;
+  opacity: 0.055; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 180px;
-  animation: grainShift 0.9s steps(2) infinite;
+  background-size: 220px;
+  /* slow drift — never steps()/sub-second pulse (that strobed against corridor scrub) */
+  animation: grainShift 9s linear infinite;
+  transition: opacity 0.8s var(--ease);
 }
 @keyframes grainShift {
-  0% { transform: translate(0,0); }
-  25% { transform: translate(-1%, 1%); }
-  50% { transform: translate(1%, -1%); }
-  75% { transform: translate(-1%, -2%); }
-  100% { transform: translate(2%, 1%); }
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-0.4%, 0.35%); }
+  50% { transform: translate(0.35%, -0.3%); }
+  75% { transform: translate(-0.3%, -0.45%); }
+  100% { transform: translate(0.4%, 0.25%); }
 }
+/* corridor stack already has soft-light plates + mist — keep grain quieter here */
+body.is-corridor-act .grain { opacity: 0.028; }
+body.is-wake-act .grain { opacity: 0.03; }
 
 .vignette {
   position: fixed; inset: 0; z-index: 88; pointer-events: none;
@@ -121,16 +126,18 @@ button:focus-visible { outline: 1px solid var(--fluorescent-soft); outline-offse
 
 .scan {
   position: fixed; inset: 0; z-index: 89; pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.022;
   background: repeating-linear-gradient(
     0deg,
     transparent,
     transparent 2px,
-    rgba(0,0,0,0.35) 2px,
-    rgba(0,0,0,0.35) 3px
+    rgba(0,0,0,0.28) 2px,
+    rgba(0,0,0,0.28) 3px
   );
   mix-blend-mode: multiply;
+  /* static — never animate; competing with scrub layers reads as strobe */
 }
+body.is-corridor-act .scan { opacity: 0.014; }
 
 .letterbox {
   position: fixed; inset: 0; z-index: 92; pointer-events: none;
@@ -148,13 +155,15 @@ button:focus-visible { outline: 1px solid var(--fluorescent-soft); outline-offse
 
 .leak {
   position: fixed; inset: 0; z-index: 87; pointer-events: none;
-  opacity: 0; mix-blend-mode: screen;
+  opacity: 0; mix-blend-mode: soft-light;
+  /* cooler / weaker — amber screen + dawn mullion read as a golden rod */
   background:
-    radial-gradient(ellipse 40% 30% at 78% 18%, rgba(255, 210, 160, 0.22), transparent 70%),
-    radial-gradient(ellipse 30% 40% at 12% 80%, rgba(160, 200, 255, 0.08), transparent 70%);
-  transition: opacity 1.2s var(--ease);
+    radial-gradient(ellipse 48% 36% at 82% 14%, rgba(210, 220, 230, 0.14), transparent 72%),
+    radial-gradient(ellipse 34% 42% at 18% 78%, rgba(170, 190, 210, 0.10), transparent 70%),
+    radial-gradient(ellipse 28% 24% at 62% 48%, rgba(200, 190, 170, 0.05), transparent 75%);
+  transition: opacity 1.6s var(--ease);
 }
-.leak.is-on { opacity: 1; }
+.leak.is-on { opacity: 0.72; }
 
 .cursor {
   position: fixed; top: 0; left: 0; width: 28px; height: 28px;
@@ -330,7 +339,7 @@ button:focus-visible { outline: 1px solid var(--fluorescent-soft); outline-offse
   mix-blend-mode: soft-light;
   mask-image: linear-gradient(90deg, transparent 10%, #000 40%, #000 70%, transparent 95%);
   -webkit-mask-image: linear-gradient(90deg, transparent 10%, #000 40%, #000 70%, transparent 95%);
-  filter: saturate(0.9) brightness(0.85);
+  filter: saturate(0.75) brightness(0.8) contrast(0.98);
 }
 .corridor__plate--detail {
   z-index: 3;
@@ -338,36 +347,30 @@ button:focus-visible { outline: 1px solid var(--fluorescent-soft); outline-offse
   mix-blend-mode: soft-light;
   mask-image: linear-gradient(180deg, transparent 25%, #000 55%, #000 68%, transparent 92%);
   -webkit-mask-image: linear-gradient(180deg, transparent 25%, #000 55%, #000 68%, transparent 92%);
-  filter: saturate(0.85) brightness(0.9) contrast(1.05);
+  filter: saturate(0.7) brightness(0.82) contrast(1.0);
 }
 .corridor__plate--handle {
   z-index: 4;
   opacity: 0;
-  mix-blend-mode: normal;
-  mask-image: radial-gradient(ellipse at 70% 55%, #000 8%, transparent 42%);
-  -webkit-mask-image: radial-gradient(ellipse at 70% 55%, #000 8%, transparent 42%);
-  filter: saturate(0.9) contrast(1.05) brightness(0.75);
+  mix-blend-mode: soft-light;
+  /* tighter mask + cooler grade so brass lever never reads as a mid-corridor gold bar */
+  mask-image: radial-gradient(ellipse at 68% 52%, #000 5%, transparent 34%);
+  -webkit-mask-image: radial-gradient(ellipse at 68% 52%, #000 5%, transparent 34%);
+  filter: saturate(0.45) contrast(0.95) brightness(0.62) hue-rotate(8deg);
 }
 .corridor__mist {
   position: absolute; inset: 0; z-index: 5; pointer-events: none;
   background:
-    radial-gradient(ellipse 60% 40% at 50% 55%, rgba(200, 220, 180, 0.06), transparent 70%),
-    linear-gradient(180deg, rgba(8,9,8,0.15), transparent 30%, transparent 70%, rgba(8,9,8,0.55));
+    radial-gradient(ellipse 60% 40% at 50% 55%, rgba(200, 220, 180, 0.045), transparent 70%),
+    linear-gradient(180deg, rgba(8,9,8,0.18), transparent 30%, transparent 70%, rgba(8,9,8,0.55));
+  /* opacity owned by scrub — keep static otherwise */
 }
 .corridor__fluorescent {
   position: absolute; inset: 0; z-index: 6; pointer-events: none;
-  background:
-    radial-gradient(ellipse 50% 20% at 50% 8%, rgba(210, 240, 170, 0.11), transparent 60%),
-    radial-gradient(ellipse 30% 12% at 48% 6%, rgba(200, 230, 160, 0.06), transparent 70%);
-  opacity: 0.58;
-  /* 极慢亮度起伏，像灯管嗡鸣；reduced-motion 下关掉 */
-  animation: lampHum 5.5s ease-in-out infinite;
-}
-@keyframes lampHum {
-  0%, 100% { opacity: 0.5; }
-  40% { opacity: 0.62; }
-  55% { opacity: 0.48; }
-  78% { opacity: 0.6; }
+  background: radial-gradient(ellipse 52% 18% at 50% 7%, rgba(200, 230, 170, 0.06), transparent 62%);
+  opacity: 0.38;
+  animation: none;
+  /* permanently near-static — no lampHum / fluPulse / infinite pulse */
 }
 
 .corridor__doors {
@@ -380,9 +383,10 @@ button:focus-visible { outline: 1px solid var(--fluorescent-soft); outline-offse
   width: clamp(64px, 8vw, 96px); height: clamp(96px, 16vh, 150px);
   display: grid; place-items: end center;
   padding-bottom: 6px;
-  opacity: 0.28; transition: opacity 0.55s var(--ease);
+  /* opacity owned by ScrollTrigger scrub — CSS transition fought scrub and strobed */
+  opacity: 0.28;
 }
-.portal:hover, .portal:focus-visible { opacity: 1; }
+.portal:hover, .portal:focus-visible { opacity: 1 !important; }
 .portal__ring {
   position: absolute; inset: 12% 22%;
   border: 1px solid rgba(230, 226, 214, 0);
@@ -977,19 +981,38 @@ body.is-touch .echo { cursor: pointer; }
 }
 .wake__bg {
   position: absolute; inset: -4%;
-  filter: saturate(0.55) brightness(1.05) contrast(0.95);
-  transition: filter 1.8s var(--ease);
+  /* cooler base grade; avoid brightness punch that turns mullion into a gold bar */
+  filter: saturate(0.42) brightness(0.96) contrast(0.9);
+  transition: filter 2s var(--ease);
 }
 .wake.is-bleach .wake__bg {
-  filter: saturate(0.15) brightness(1.35) contrast(0.85);
+  filter: saturate(0.2) brightness(1.08) contrast(0.86);
 }
+.wake__mullion-veil {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  /* soft cool veil over left-window specular streak */
+  background:
+    linear-gradient(90deg,
+      transparent 10%,
+      rgba(96, 104, 112, 0.22) 24%,
+      rgba(110, 118, 126, 0.16) 33%,
+      transparent 50%),
+    radial-gradient(ellipse 26% 58% at 30% 40%, rgba(160, 168, 176, 0.28), transparent 72%);
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+  transition: opacity 2s var(--ease);
+}
+.wake.is-bleach .wake__mullion-veil { opacity: 0.72; }
 .wake__bleach {
-  position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse at 30% 40%, rgba(255,255,245,0.55), transparent 55%);
-  opacity: 0; mix-blend-mode: screen;
-  transition: opacity 1.6s var(--ease);
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  /* cooler, broader wash — avoid hot ellipse parked on the mullion */
+  background:
+    radial-gradient(ellipse 72% 58% at 58% 48%, rgba(236, 240, 244, 0.26), transparent 64%),
+    radial-gradient(ellipse 48% 42% at 78% 30%, rgba(210, 218, 226, 0.12), transparent 60%);
+  opacity: 0; mix-blend-mode: soft-light;
+  transition: opacity 2s var(--ease);
 }
-.wake.is-bleach .wake__bleach { opacity: 1; }
+.wake.is-bleach .wake__bleach { opacity: 0.8; }
 .wake__copy {
   position: relative; z-index: 2; text-align: center; padding: 24px;
 }
@@ -1033,10 +1056,15 @@ body.is-touch .echo { cursor: pointer; }
 /* reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .grain, .scan { animation: none; }
-  .corridor__fluorescent { animation: none; opacity: 0.55; }
+  .grain { opacity: 0.03; }
+  body.is-corridor-act .grain,
+  body.is-wake-act .grain { opacity: 0.02; }
+  .corridor__fluorescent { animation: none; opacity: 0.32; }
   .wake__verses { background: rgba(232,226,214,0.03); }
   .enter__flicker.is-blink { animation: none; opacity: 0.2; }
+  .enter__thesis .caret { animation: none; opacity: 0.45; }
   .cursor { transition: none; }
+  .leak, .wake__bleach, .wake__mullion-veil, .wake__bg { transition: none; }
   .room__choice,
   .room__aftermath,
   .room__soft-hint,
